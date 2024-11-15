@@ -8,10 +8,14 @@ A firewall essentially works by filtering traffic based on certain rules, such a
 
 ---
 
-# Simple Python Firewall Example Using `scapy`
+# Python Firewall with Packet Filtering and Logging
 
-Here’s a basic example of a Python firewall that uses scapy to monitor network traffic and decide whether to allow or block certain packets based on predefined rules.
+This project implements a simple network firewall using Python and scapy. It filters packets based on IP addresses and ports, detects IP spoofing, logs allowed and blocked packets, and can even redirect HTTP traffic to another port.
 
-Requirements:
-- Install scapy using pip install scapy
-- Python 3.x
+**Features**:
+- Port Filtering: Block or allow traffic based on destination ports.
+- Logging: Record allowed and blocked packets in a log file.
+- Packet Redirection: Redirect specific traffic (e.g., HTTP on port 80) to another IP/port.
+- IP Spoofing Detection: Basic detection of packets with spoofed source IP addresses.
+
+
