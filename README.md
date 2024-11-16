@@ -19,11 +19,11 @@ This project implements a simple network firewall using Python and scapy. It fil
  **How It Works**:
 - The script listens for incoming and outgoing packets on your network interface.
 - It checks the packets against several filtering rules:
-    - Allowed IPs: Only packets from specific IP addresses are allowed.
-    - Allowed Ports: Only packets to specific destination ports (e.g., SSH or HTTPS) are allowed.
-    - Blocked Ports: Packets to blocked ports (e.g., HTTP on port 80) are dropped.
-    - IP Spoofing: If the source IP doesn't match the allowed list, it is considered spoofed and blocked.
-    - Redirection: HTTP traffic (port 80) is redirected to a different IP and port (e.g., 8080).
+    - **Allowed IPs**: Only packets from specific IP addresses are allowed.
+    - **Allowed Ports**: Only packets to specific destination ports (e.g., SSH or HTTPS) are allowed.
+    - **Blocked Ports**: Packets to blocked ports (e.g., HTTP on port 80) are dropped.
+    - **IP Spoofing**: If the source IP doesn't match the allowed list, it is considered spoofed and blocked.
+    - **Redirection**: HTTP traffic (port 80) is redirected to a different IP and port (e.g., 8080).
 
 **Logging**:
 
@@ -31,9 +31,9 @@ All allowed and blocked packets are logged in a file named firewall_log.txt. You
 
 
 **Modifying the Script**:
-- Change Allowed IPs: Modify the `allowed_ips` list in the script.
-- Change Allowed Ports: Modify the `allowed_ports` list to specify which ports are allowed.
-- Modify Logging: Logs are stored in `firewall_log.txt`. You can change the logging settings as needed.
+- **Change Allowed IPs**: Modify the `allowed_ips` list in the script.
+- **Change Allowed Ports**: Modify the `allowed_ports` list to specify which ports are allowed.
+- **Modify Logging**: Logs are stored in `firewall_log.txt`. You can change the logging settings as needed.
 
 
 ---
@@ -45,3 +45,17 @@ All allowed and blocked packets are logged in a file named firewall_log.txt. You
 
 2. **Logging**:
     -  We use Python's built-in logging module to log allowed and blocked packets into a file called firewall_log.txt. The log entries include timestamps for when the action took place.
+
+3. **Packet Dropping or Redirection**:
+    -  If a packet is from an allowed source IP and the destination port is 80 (HTTP), we simulate a packet redirection to a different port (8080) and IP (192.168.1.100). The packet is modified and sent to the new destination.
+    -  For all blocked packets (like HTTP packets), the script simply ignores them, effectively dropping the packet.
+
+4. **IP Spoofing Detection**:
+    -  We added a basic IP spoofing detection mechanism. If the source IP address of a packet is not in the allowed_ips list, it is flagged as a spoofed packet and blocked.
+    -  Spoofing can be a complex topic, and more advanced checks could involve matching source IPs with expected traffic patterns (e.g., validating that a response packet is from the same source as the request).
+<br>
+<br>
+**Running the Script**:
+
+    1. Start the script: This will begin sniffing network traffic. You'll see logs generated for allowed and blocked packets in the firewall_log.txt file.
+    2. Test the script: You can test it by trying to connect to the blocked ports (e.g., port 80 for HTTP traffic) and see if they get blocked. You can also try to spoof a source IP to see if it gets detected and blocked.
