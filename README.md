@@ -58,7 +58,7 @@ All allowed and blocked packets are logged in a file named firewall_log.txt. You
   1. Start the script: This will begin sniffing network traffic. You'll see logs generated for allowed and blocked packets in the firewall_log.txt file.
   2. Test the script: You can test it by trying to connect to the blocked ports (e.g., port 80 for HTTP traffic) and see if they get blocked. You can also try to spoof a source IP to see if it gets detected and blocked.
 
-Code Implementation:
+# Code Implementation:
 ```python
 import logging
 from scapy.all import *
