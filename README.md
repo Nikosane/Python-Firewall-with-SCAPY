@@ -34,3 +34,14 @@ All allowed and blocked packets are logged in a file named firewall_log.txt. You
 - Change Allowed IPs: Modify the `allowed_ips` list in the script.
 - Change Allowed Ports: Modify the `allowed_ports` list to specify which ports are allowed.
 - Modify Logging: Logs are stored in `firewall_log.txt`. You can change the logging settings as needed.
+
+
+---
+
+# Explanation of the Extended Features
+1. **Port Filtering**:
+  -  We created a list of `allowed_ports` (SSH on port 22 and HTTPS on port 443) and a `blocked_ports` list (HTTP on port 80).
+  -  If a packet arrives with a destination port that’s in the `blocked_ports` list (HTTP traffic), it is blocked (dropped).
+
+2. **Logging**:
+  -  We use Python's built-in logging module to log allowed and blocked packets into a file called firewall_log.txt. The log entries include timestamps for when the action took place.
