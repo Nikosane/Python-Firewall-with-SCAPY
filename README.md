@@ -53,9 +53,94 @@ All allowed and blocked packets are logged in a file named firewall_log.txt. You
 4. **IP Spoofing Detection**:
     -  We added a basic IP spoofing detection mechanism. If the source IP address of a packet is not in the allowed_ips list, it is flagged as a spoofed packet and blocked.
     -  Spoofing can be a complex topic, and more advanced checks could involve matching source IPs with expected traffic patterns (e.g., validating that a response packet is from the same source as the request).
-<br>
-<br>
-**Running the Script**:
 
-    1. Start the script: This will begin sniffing network traffic. You'll see logs generated for allowed and blocked packets in the firewall_log.txt file.
-    2. Test the script: You can test it by trying to connect to the blocked ports (e.g., port 80 for HTTP traffic) and see if they get blocked. You can also try to spoof a source IP to see if it gets detected and blocked.
+**Running the Script**:
+  1. Start the script: This will begin sniffing network traffic. You'll see logs generated for allowed and blocked packets in the firewall_log.txt file.
+  2. Test the script: You can test it by trying to connect to the blocked ports (e.g., port 80 for HTTP traffic) and see if they get blocked. You can also try to spoof a source IP to see if it gets detected and blocked.
+
+Code Implementation:
+```python
+import logging
+from scapy.all import *
+
+# Define a list of allowed IPs and ports (for demonstration purposes)
+allowed_ips = ["192.168.1.1", "192.168.1.2"]
+allowed_ports = [22, 443]  # Allow SSH and HTTPS traffic
+blocked_ports = [80]  # Block HTTP traffic
+
+# Setup logging
+logging.basicConfig(filename='firewall_log.txt', level=logging.INFO,
+                    format='%(asctime)s - %(message)s')
+
+# Function to detect IP spoofing (basic detection)
+def detect_ip_spoofing(packet):
+    if packet.haslayer(IP):
+        ip_src = packet[IP].src
+        ip_dst = packet[IP].dst
+        # If source IP is not allowed or doesn't match expected IP, flag it as spoofed
+        if ip_src not in allowed_ips:
+            logging.warning(f"IP Spoofing detected: Source IP {ip_src} is not in allowed list.")
+            return True
+    return False
+
+# Function to handle packets and apply filtering
+def packet_filter(packet):
+    if packet.haslayer(IP):
+        ip_src = packet[IP].src
+        ip_dst = packet[IP].dst
+        src_port = packet[IP].sport if packet.haslayer(TCP) else None
+        dst_port = packet[IP].dport if packet.haslayer(TCP) else None
+        
+        # Detect IP Spoofing
+        if detect_ip_spoofing(packet):
+            print(f"Blocked spoofed packet from {ip_src} to {ip_dst}")
+            logging.warning(f"Blocked spoofed packet from {ip_src} to {ip_dst}")
+            return  # Drop the packet
+
+        # Check port filtering: Block HTTP traffic (port 80)
+        if dst_port == 80:
+            print(f"Blocked HTTP packet from {ip_src} to {ip_dst} on port {dst_port}")
+            logging.info(f"Blocked HTTP packet from {ip_src} to {ip_dst} on port {dst_port}")
+            return  # Drop the packet
+
+        # Check if the source IP is allowed
+        if ip_src not in allowed_ips:
+            print(f"Blocked packet from {ip_src} to {ip_dst}")
+            logging.info(f"Blocked packet from {ip_src} to {ip_dst}")
+            return  # Drop the packet
+
+        # Check if the destination port is allowed (only allow SSH and HTTPS)
+        if dst_port not in allowed_ports:
+            print(f"Blocked packet from {ip_src} to {ip_dst} on port {dst_port}")
+            logging.info(f"Blocked packet from {ip_src} to {ip_dst} on port {dst_port}")
+            return  # Drop the packet
+
+        # If the packet passes all the checks, allow it and log the event
+        print(f"Allowed packet from {ip_src} to {ip_dst} on port {dst_port}")
+        logging.info(f"Allowed packet from {ip_src} to {ip_dst} on port {dst_port}")
+
+        # If necessary, redirect packets (Example: redirect HTTP traffic to a different port)
+        if dst_port == 80:
+            print(f"Redirecting HTTP packet from {ip_src} to {ip_dst} on port {dst_port}")
+            logging.info(f"Redirecting HTTP packet from {ip_src} to {ip_dst} on port {dst_port}")
+            # Example of redirection (using scapy)
+            # Send the packet to a different address or port (this is a simple example)
+            packet[IP].dst = "192.168.1.100"  # Redirect to a new IP
+            packet[IP].dport = 8080  # Redirect to a new port
+            send(packet)  # Send the modified packet
+            return  # Drop the original packet
+
+# Start sniffing the network
+print("Firewall is running...")
+sniff(prn=packet_filter, store=0)
+```
+
+Example Log Entries:
+```bash
+2024-11-15 22:15:00 - Blocked HTTP packet from 192.168.1.100 to 192.168.1.2 on port 80
+2024-11-15 22:16:00 - Allowed packet from 192.168.1.1 to 192.168.1.2 on port 443
+2024-11-15 22:17:00 - IP Spoofing detected: Source IP 192.168.1.300 is not in allowed list
+```
+
+# Contribution:
+Feel free to fork this project, raise issues, or submit pull requests for improvements.
