@@ -38,9 +38,9 @@ All allowed and blocked packets are logged in a file named firewall_log.txt. You
 
 ---
 
-# Explanation of the Extended Features
+# Explanation of the Firewall Features
 1. **Port Filtering**:
-  -  We created a list of `allowed_ports` (SSH on port 22 and HTTPS on port 443) and a `blocked_ports` list (HTTP on port 80).
+  -  I created a list of `allowed_ports` (SSH on port 22 and HTTPS on port 443) and a `blocked_ports` list (HTTP on port 80).
   -  If a packet arrives with a destination port that’s in the `blocked_ports` list (HTTP traffic), it is blocked (dropped).
 
 2. **Logging**:
